@@ -1,6 +1,7 @@
-import PhotoSwipeLightbox from "./photoswipe/photoswipe-lightbox.esm.js";
-import PhotoSwipe from "./photoswipe/photoswipe.esm.js";
+import PhotoSwipeLightbox       from "./photoswipe/photoswipe-lightbox.esm.js";
+import PhotoSwipe               from "./photoswipe/photoswipe.esm.js";
 import PhotoSwipeDynamicCaption from "./photoswipe/photoswipe-dynamic-caption-plugin.esm.min.js";
+import PhotoSwipeVideoPlugin    from "./photoswipe/photoswipe-video-plugin.esm.js";
 import * as params from "@params";
 
 const gallery = document.getElementById("gallery");
@@ -35,6 +36,15 @@ if (gallery) {
     errorMsg: params.errorMsg,
   });
 
+
+
+  // Dynamic captions for image and video items
+  new PhotoSwipeDynamicCaption(lightbox, {
+    mobileLayoutBreakpoint: 700,
+    type: "auto",
+    mobileCaptionOverlapRatio: 1,
+  });
+
   lightbox.on("uiRegister", () => {
     lightbox.pswp.ui.registerElement({
       name: "download-button",
@@ -58,6 +68,13 @@ if (gallery) {
     });
   });
 
+  //lightbox.on('contentLoad', (event) => {
+  //const content = event.content;
+  //if (!content || !isVideoContent(content)) console.log('n:', n);
+  //return; // Ensure content exists
+  // Your logic here
+  //});
+
   lightbox.on("change", () => {
     history.replaceState("", document.title, "#" + lightbox.pswp.currSlide.index);
   });
@@ -66,18 +83,21 @@ if (gallery) {
     history.replaceState("", document.title, window.location.pathname);
   });
 
-  new PhotoSwipeDynamicCaption(lightbox, {
-    mobileLayoutBreakpoint: 700,
-    type: "auto",
-    mobileCaptionOverlapRatio: 1,
-  });
-
   lightbox.init();
 
+  // Handle opening via hash
   if (window.location.hash.substring(1).length > 0) {
     const index = parseInt(window.location.hash.substring(1), 10);
     if (!Number.isNaN(index) && index >= 0 && index < gallery.querySelectorAll("a").length) {
       lightbox.loadAndOpen(index, { gallery });
     }
   }
+
+
+// Initialize PhotoSwipe video plugin
+    new PhotoSwipeVideoPlugin(lightbox, {
+      autoplay: true,
+      videoAttributes: { controls: '', playsinline: '', preload: 'auto' },
+      preventDragOffset: 40,
+    });
 }
